@@ -10,28 +10,22 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 st.title("The computers have eyes")
 
-# Load model from Hugging Face
+# Load model from Hugging Face - ALWAYS DOWNLOAD
 @st.cache_resource
 def load_model():
     model_path = 'digit_recognizer.keras'
     
-    # Check if model already exists locally
-    if os.path.exists(model_path):
-        st.write("Loading existing model...")
-        return keras.models.load_model(model_path)
-    
-    # If not, download from Hugging Face
-    st.write("Beep boop path time...")
+    st.write("Downloading pre-trained model from Hugging Face...")
     st.write("(This may take a few seconds)")
     
-    # Hugging Face model URL - FIXED
+    # Hugging Face model URL - USE YOUR CORRECT USERNAME
     url = "https://huggingface.co/catgat/digits-recognizer/resolve/main/digit_recognizer.keras"
     
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Check if download worked
+        response.raise_for_status()
         
-        # Save the model file
+        # Always overwrite the local file
         with open(model_path, 'wb') as f:
             f.write(response.content)
         
