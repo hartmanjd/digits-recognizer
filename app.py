@@ -8,15 +8,16 @@ import os
 import requests
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-st.title("The computers have eyes")
+st.title("everything's computer")
+st.write("👁️👃👁️")
 
 # Load model from Hugging Face - ALWAYS DOWNLOAD
 @st.cache_resource
 def load_model():
     model_path = 'digit_recognizer.keras'
     
-    st.write("Downloading pre-trained model from Hugging Face...")
-    st.write("(This may take a few seconds)")
+    st.write("beep boop math time...")
+    st.write("(please hold")
     
     # Hugging Face model URL - USE YOUR CORRECT USERNAME
     url = "https://huggingface.co/catgat/digits-recognizer/resolve/main/digit_recognizer.keras"
@@ -40,7 +41,7 @@ def load_model():
 model = load_model()
 
 # --- Canvas ---
-st.write("Draw a digit below and watch the AI recognize it!")
+st.write("draw a number and behold!")
 
 canvas_result = st_canvas(
     fill_color="#000000",
