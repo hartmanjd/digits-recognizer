@@ -7,13 +7,48 @@ from streamlit_drawable_canvas import st_canvas
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-# Load model
-model = keras.models.load_model('digit_recognizer.keras')
-
 st.title("✏️ Handwritten Digit Recognizer")
 st.write("Draw a digit below and watch the AI recognize it!")
 
-# Canvas with REAL-TIME updates
+# --- Check if model exists, if not train it ---
+@st.cache_resource
+def load_or_train_model():
+    model_path = 'digit_recognizer.keras'
+    
+    if os.path.exists(model_path):
+        st.write("✅ Loading existing model...")
+        return keras.models.load_model(model_path)
+    else:
+        st.write("⏳ Training model on MNIST data (this will take ~1-2 minutes)...")
+        
+        # Load MNIST data
+        (x_train, y_train), (_, _) = keras.datasets.mnist.load_data()
+        x_train = x_train / 255.0
+        
+        # Build model
+        model = keras.Sequential([
+            keras.layers.Flatten(input_shape=(28, 28)),
+            keras.layers.Dense(128, activation='relu'),
+            keras.layers.Dense(10, activation='softmax')
+        ])
+        
+        # Compile and train
+        model.compile(optimizer='adam',
+                      loss='sparse_categorical_crossentropy',
+                      metrics=['accuracy'])
+        model.fit(x_train, y_train, epochs=5, verbose=1)
+        
+        # Save the model
+        model.save(model_path)
+        st.write("✅ Model trained and saved!")
+        return model
+
+# Load or train the model
+model = load_or_train_model()
+
+# --- Canvas ---
+st.write("Draw a digit below and watch the AI recognize it!")
+
 canvas_result = st_canvas(
     fill_color="#000000",
     stroke_width=20,
@@ -27,49 +62,37 @@ canvas_result = st_canvas(
 )
 
 if canvas_result.image_data is not None:
-    # Check if anything was drawn
     has_content = np.any(canvas_result.image_data[:, :, :3] > 0)
     
     if has_content:
-        # --- FIX: Use RGB channels properly ---
-        # The canvas returns RGBA or RGB
-        # We want to convert to grayscale properly
-        
+        # Convert to grayscale
         if canvas_result.image_data.shape[2] == 4:
-            # RGBA - use RGB channels, ignore alpha
             rgb = canvas_result.image_data[:, :, :3]
         else:
-            # RGB
             rgb = canvas_result.image_data
         
-        # Convert RGB to grayscale using luminance formula
-        # This gives us white strokes on black background
         gray = np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
         
-        # The canvas has black (0) background and white (255) strokes
-        # This matches MNIST format (black background, white digit)
-        # So we don't need to invert!
-        
-        # Resize to 28x28
+        # Resize
         img_pil = Image.fromarray(gray.astype('uint8'))
         img_pil = img_pil.resize((28, 28), Image.Resampling.LANCZOS)
         img_array = np.array(img_pil) / 255.0
         
-        # Now predict
+        # Predict
         prediction = model.predict(img_array.reshape(1, 28, 28))
         predicted_digit = np.argmax(prediction)
         confidence = np.max(prediction) * 100
         
-        # Show the image and result
+        # Show results
         col1, col2 = st.columns([1, 2])
         with col1:
-            st.image(img_array.reshape(28, 28), caption="What model sees", width=150)
+            st.image(img_array.reshape(28, 28), width=150)
         with col2:
             st.subheader(f"Prediction: {predicted_digit}")
             st.write(f"Confidence: {confidence:.1f}%")
         
         st.bar_chart(prediction[0])
     else:
-        st.info("✏️ Draw a digit on the canvas above!")
+        st.info("draw a number!")
 else:
-    st.info("✏️ Draw a digit on the canvas above!")
+    st.info("draw a number!")
