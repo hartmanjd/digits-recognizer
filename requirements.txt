@@ -3,3 +3,4 @@ streamlit==1.39.0
 streamlit-drawable-canvas==0.9.3
 numpy==2.0.2
 pillow==10.4.0
+requests

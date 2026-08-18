@@ -5,49 +5,49 @@ import tensorflow as tf
 from tensorflow import keras
 from streamlit_drawable_canvas import st_canvas
 import os
+import requests
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-st.title("✏️ Handwritten Digit Recognizer")
-st.write("Draw a digit below and watch the AI recognize it!")
+st.title("👀 the computers have eyes 👀)
+st.write()
 
-# --- Check if model exists, if not train it ---
+# --- Load model from Hugging Face ---
 @st.cache_resource
-def load_or_train_model():
+def load_model():
     model_path = 'digit_recognizer.keras'
     
+    # Check if model already exists locally
     if os.path.exists(model_path):
         st.write("✅ Loading existing model...")
         return keras.models.load_model(model_path)
-    else:
-        st.write("⏳ Training model on MNIST data (this will take ~1-2 minutes)...")
+    
+    # If not, download from Hugging Face
+    st.write("beep boop math time...")
+    st.write("(This may take a few seconds)")
+    
+    # Hugging Face model URL
+    url = "https://huggingface.co/catgat/digits-recognizer/resolve/main/digit_recognizer.keras"
+    
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Check if download worked
         
-        # Load MNIST data
-        (x_train, y_train), (_, _) = keras.datasets.mnist.load_data()
-        x_train = x_train / 255.0
+        # Save the model file
+        with open(model_path, 'wb') as f:
+            f.write(response.content)
         
-        # Build model
-        model = keras.Sequential([
-            keras.layers.Flatten(input_shape=(28, 28)),
-            keras.layers.Dense(128, activation='relu'),
-            keras.layers.Dense(10, activation='softmax')
-        ])
-        
-        # Compile and train
-        model.compile(optimizer='adam',
-                      loss='sparse_categorical_crossentropy',
-                      metrics=['accuracy'])
-        model.fit(x_train, y_train, epochs=5, verbose=1)
-        
-        # Save the model
-        model.save(model_path)
-        st.write("✅ Model trained and saved!")
-        return model
+        st.write("✅ Model downloaded successfully!")
+        return keras.models.load_model(model_path)
+    
+    except Exception as e:
+        st.error(f"❌ Error downloading model: {e}")
+        st.stop()
 
-# Load or train the model
-model = load_or_train_model()
+# Load the model
+model = load_model()
 
 # --- Canvas ---
-st.write("Draw a digit below and watch the AI recognize it!")
+st.write("feed me numbers yum yum")
 
 canvas_result = st_canvas(
     fill_color="#000000",
@@ -93,6 +93,6 @@ if canvas_result.image_data is not None:
         
         st.bar_chart(prediction[0])
     else:
-        st.info("draw a number!")
+        st.info("✏️ Draw a digit on the canvas above!")
 else:
-    st.info("draw a number!")
+    st.info("✏️ Draw a digit on the canvas above!")
