@@ -8,24 +8,23 @@ import os
 import requests
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-st.title("👀 the computers have eyes 👀")
-st.write()
+st.title("The computers have eyes")
 
-# --- Load model from Hugging Face ---
+# Load model from Hugging Face
 @st.cache_resource
 def load_model():
     model_path = 'digit_recognizer.keras'
     
     # Check if model already exists locally
     if os.path.exists(model_path):
-        st.write("✅ Loading existing model...")
+        st.write("Loading existing model...")
         return keras.models.load_model(model_path)
     
     # If not, download from Hugging Face
-    st.write("beep boop math time...")
+    st.write("Beep boop path time...")
     st.write("(This may take a few seconds)")
     
-    # Hugging Face model URL
+    # Hugging Face model URL - FIXED
     url = "https://huggingface.co/catgat/digits-recognizer/resolve/main/digit_recognizer.keras"
     
     try:
@@ -36,18 +35,18 @@ def load_model():
         with open(model_path, 'wb') as f:
             f.write(response.content)
         
-        st.write("✅ Model downloaded successfully!")
+        st.write("Model downloaded successfully!")
         return keras.models.load_model(model_path)
     
     except Exception as e:
-        st.error(f"❌ Error downloading model: {e}")
+        st.error(f"Error downloading model: {e}")
         st.stop()
 
 # Load the model
 model = load_model()
 
 # --- Canvas ---
-st.write("feed me numbers yum yum")
+st.write("Draw a digit below and watch the AI recognize it!")
 
 canvas_result = st_canvas(
     fill_color="#000000",
@@ -93,6 +92,6 @@ if canvas_result.image_data is not None:
         
         st.bar_chart(prediction[0])
     else:
-        st.info("✏️ Draw a digit on the canvas above!")
+        st.info("Draw a digit on the canvas above!")
 else:
-    st.info("✏️ Draw a digit on the canvas above!")
+    st.info("Draw a digit on the canvas above!")
