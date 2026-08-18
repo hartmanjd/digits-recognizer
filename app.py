@@ -16,7 +16,7 @@ st.write("👁️👃👁️")
 def load_model():
     model_path = 'digit_recognizer.keras'
     
-    st.write("beep boop math time...")
+    st.write("beep boop computer time...(please hold)")
     st.write("(please hold")
     
     # Hugging Face model URL - USE YOUR CORRECT USERNAME
@@ -30,7 +30,7 @@ def load_model():
         with open(model_path, 'wb') as f:
             f.write(response.content)
         
-        st.write("Model downloaded successfully!")
+        st.write("🪬the model is now watching🪬")
         return keras.models.load_model(model_path)
     
     except Exception as e:
@@ -41,7 +41,7 @@ def load_model():
 model = load_model()
 
 # --- Canvas ---
-st.write("draw a number and behold!")
+st.write("draw a number...and behold!")
 
 canvas_result = st_canvas(
     fill_color="#000000",
