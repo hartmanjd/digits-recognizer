@@ -10,40 +10,62 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 st.title("everything's computer 👁️👃👁️")
 
-# --- Load model from Hugging Face ---
 @st.cache_resource
 def load_model():
     model_path = 'digit_recognizer.keras'
-    
-    # Check if model exists locally
     if os.path.exists(model_path):
-        st.write("✅ Loading existing model...")
         return keras.models.load_model(model_path)
     
-    # Download from Hugging Face
-    st.write("📥 Downloading model from Hugging Face...")
-    
-    # YOUR HUGGING FACE MODEL URL
     url = "https://huggingface.co/catgat/digits-recognizer/resolve/main/digit_recognizer.keras"
-    
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        
-        with open(model_path, 'wb') as f:
-            f.write(response.content)
-        
-        st.write("✅ Model downloaded successfully!")
-        return keras.models.load_model(model_path)
-    
-    except Exception as e:
-        st.error(f"Error downloading model: {e}")
-        st.stop()
+    response = requests.get(url)
+    with open(model_path, 'wb') as f:
+        f.write(response.content)
+    return keras.models.load_model(model_path)
 
-# Load the model
 model = load_model()
 
-# --- Canvas ---
+def center_digit(img_array):
+    """Center the digit within the 28x28 frame."""
+    # Find where the digit is (non-zero pixels)
+    coords = np.argwhere(img_array > 0.05)  # Slight threshold to ignore noise
+    
+    if len(coords) == 0:
+        return img_array
+    
+    # Get bounding box
+    y_min, x_min = coords.min(axis=0)
+    y_max, x_max = coords.max(axis=0)
+    
+    # Crop to the digit
+    cropped = img_array[y_min:y_max+1, x_min:x_max+1]
+    
+    # If the digit is too small, add some margin
+    h, w = cropped.shape
+    margin = 2
+    if h > 4 and w > 4:
+        # Add small margin around digit
+        y_min = max(0, y_min - margin)
+        y_max = min(27, y_max + margin)
+        x_min = max(0, x_min - margin)
+        x_max = min(27, x_max + margin)
+        cropped = img_array[y_min:y_max+1, x_min:x_max+1]
+        h, w = cropped.shape
+    
+    target_size = 28
+    
+    # Pad to center
+    pad_top = (target_size - h) // 2
+    pad_bottom = target_size - h - pad_top
+    pad_left = (target_size - w) // 2
+    pad_right = target_size - w - pad_left
+    
+    centered = np.pad(cropped, 
+                      ((pad_top, pad_bottom), (pad_left, pad_right)), 
+                      mode='constant', 
+                      constant_values=0)
+    
+    return centered
+
 st.write("Draw a digit below and watch the AI recognize it!")
 
 canvas_result = st_canvas(
@@ -62,33 +84,31 @@ if canvas_result.image_data is not None:
     has_content = np.any(canvas_result.image_data[:, :, :3] > 0)
     
     if has_content:
-        # --- IMAGE PROCESSING (Proven working) ---
-        
-        # Step 1: Get RGB channels (NOT alpha)
+        # Process image
         if canvas_result.image_data.shape[2] == 4:
             rgb = canvas_result.image_data[:, :, :3]
         else:
             rgb = canvas_result.image_data
         
-        # Step 2: Convert to grayscale using luminance formula
         gray = np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
         
-        # Step 3: Resize with high-quality LANCZOS
         img_pil = Image.fromarray(gray.astype('uint8'))
         img_pil = img_pil.resize((28, 28), Image.Resampling.LANCZOS)
         img_array = np.array(img_pil) / 255.0
         
-        # Step 4: Check if image needs inversion (mean pixel value check)
-        # MNIST expects black background, white stroke
+        # --- NEW: Center the digit ---
+        img_array = center_digit(img_array)
+        
+        # Invert if needed
         if img_array.mean() > 0.5:
             img_array = 1.0 - img_array
         
-        # Step 5: Predict
+        # Predict
         prediction = model.predict(img_array.reshape(1, 28, 28))
         predicted_digit = np.argmax(prediction)
         confidence = np.max(prediction) * 100
         
-        # Step 6: Show results
+        # Show results
         col1, col2 = st.columns([1, 2])
         with col1:
             st.image(img_array.reshape(28, 28), caption="What the model sees", width=150)
