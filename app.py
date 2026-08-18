@@ -16,9 +16,6 @@ st.write("👁️👃👁️")
 def load_model():
     model_path = 'digit_recognizer.keras'
     
-    st.write("beep boop computer time...(please hold)")
-    st.write("(please hold")
-    
     # Hugging Face model URL - USE YOUR CORRECT USERNAME
     url = "https://huggingface.co/catgat/digits-recognizer/resolve/main/digit_recognizer.keras"
     
