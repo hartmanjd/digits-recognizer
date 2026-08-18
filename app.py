@@ -8,8 +8,7 @@ import os
 import requests
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-st.title("everything's computer")
-st.write("👁️👃👁️")
+st.title("👁️👃👁️ everything's computer 👁️👃👁️")
 
 # Load model from Hugging Face - ALWAYS DOWNLOAD
 @st.cache_resource
