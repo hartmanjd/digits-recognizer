@@ -8,7 +8,7 @@ import os
 import requests
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-st.title("👀 the computers have eyes 👀)
+st.title("👀 the computers have eyes 👀")
 st.write()
 
 # --- Load model from Hugging Face ---
