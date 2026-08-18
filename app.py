@@ -37,8 +37,6 @@ def load_model():
 model = load_model()
 
 # --- Canvas ---
-st.write("draw a number...and behold!")
-
 canvas_result = st_canvas(
     fill_color="#000000",
     stroke_width=20,
@@ -83,6 +81,6 @@ if canvas_result.image_data is not None:
         
         st.bar_chart(prediction[0])
     else:
-        st.info("Draw a digit on the canvas above!")
+        st.info("draw a number...and behold!")
 else:
-    st.info("Draw a digit on the canvas above!")
+    st.info("draw a number...and behold!")
