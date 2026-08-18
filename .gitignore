@@ -1,0 +1,32 @@
+# Virtual environments
+tf-env/
+venv/
+.env/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Model files (too large for GitHub)
+*.h5
+*.keras
+*.pb
+*.pkl
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# IDE files
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/
+
+# OS files
+.DS_Store
+Thumbs.db
