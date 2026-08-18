@@ -66,7 +66,8 @@ def center_digit(img_array):
     
     return centered
 
-st.write("Draw a digit below and watch the AI recognize it!")
+st.write("the machine yearns for a purpose...")
+st.write("draw a number (1-9)")
 
 canvas_result = st_canvas(
     fill_color="#000000",
@@ -118,6 +119,6 @@ if canvas_result.image_data is not None:
         
         st.bar_chart(prediction[0])
     else:
-        st.info("draw a number...and behold!")
+        st.info("ARE YOU NOT ENTERTAINED?!")
 else:
-    st.info("draw a number...and behold!")
+    st.info("ARE YOU NOT ENTERTAINED?!")
