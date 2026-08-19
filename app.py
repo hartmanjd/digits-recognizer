@@ -10,6 +10,23 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 st.title("everything's computer 👁️👃👁️")
 
+# --- HIDE STREAMLIT BRANDING ---
+hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stDeployButton {display: none;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# --- Initialize session state ---
+if 'draw_count' not in st.session_state:
+    st.session_state.draw_count = 0
+if 'show_popup' not in st.session_state:
+    st.session_state.show_popup = False
+
 # --- Initialize session state ---
 if 'draw_count' not in st.session_state:
     st.session_state.draw_count = 0
@@ -79,7 +96,7 @@ if st.session_state.show_popup:
     show_popup()
 
 # --- Main App ---
-st.write("Draw a digit below and watch the AI recognize it!")
+st.write("the machine is now watching. draw a number 1 - 9")
 
 canvas_result = st_canvas(
     fill_color="#000000",
