@@ -27,12 +27,6 @@ if 'draw_count' not in st.session_state:
 if 'show_popup' not in st.session_state:
     st.session_state.show_popup = False
 
-# --- Initialize session state ---
-if 'draw_count' not in st.session_state:
-    st.session_state.draw_count = 0
-if 'show_popup' not in st.session_state:
-    st.session_state.show_popup = False
-
 # --- Load model ---
 @st.cache_resource
 def load_model():
