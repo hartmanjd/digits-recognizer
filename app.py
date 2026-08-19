@@ -67,13 +67,11 @@ def center_digit(img_array):
 if st.session_state.show_popup:
     @st.dialog("ARE YOU NOT ENTERTAINED?")
     def show_popup():
-        st.markdown("### You've drawn 3 numbers... that's enough for now")
-        st.markdown("---")
-        st.write("So... are you entertained?")
+        st.write("WELL ARE YOU?")
         
         col1, col2, col3 = st.columns([1, 1, 1])
         with col2:
-            if st.button("🎭 YES", type="primary", use_container_width=True):
+            if st.button("yes", type="primary", use_container_width=True):
                 st.session_state.draw_count = 0
                 st.session_state.show_popup = False
                 st.rerun()
@@ -124,7 +122,7 @@ if canvas_result.image_data is not None:
         # --- Increment counter ---
         if confidence > 30:
             st.session_state.draw_count += 1
-            if st.session_state.draw_count >= 3 and not st.session_state.show_popup:
+            if st.session_state.draw_count >= 6 and not st.session_state.show_popup:
                 st.session_state.show_popup = True
                 st.rerun()
         
@@ -135,10 +133,10 @@ if canvas_result.image_data is not None:
         with col2:
             st.subheader(f"Prediction: {predicted_digit}")
             st.write(f"Confidence: {confidence:.1f}%")
-            st.write(f"Draws so far: {st.session_state.draw_count}/3")
+            
         
         st.bar_chart(prediction[0])
     else:
-        st.info("draw a number...and behold!")
+        st.info('')
 else:
-    st.info("draw a number...and behold!")
+    st.info('')
