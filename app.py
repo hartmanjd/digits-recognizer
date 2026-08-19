@@ -10,7 +10,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 st.title("everything's computer 👁️👃👁️")
 
-# --- Initialize session state for drawing counter ---
+# --- Initialize session state ---
 if 'draw_count' not in st.session_state:
     st.session_state.draw_count = 0
 if 'show_popup' not in st.session_state:
@@ -63,76 +63,22 @@ def center_digit(img_array):
                       constant_values=0)
     return centered
 
-# --- FUNNY POP-UP ---
+# --- FUNNY POP-UP (Subtle version using st.dialog) ---
 if st.session_state.show_popup:
-    # Overlay the entire screen with a dark background
-    st.markdown("""
-        <style>
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        .popup-content {
-            background-color: #1e1e2f;
-            padding: 60px 80px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 600px;
-            border: 3px solid #ff6b6b;
-            box-shadow: 0 0 60px rgba(255, 107, 107, 0.3);
-        }
-        .popup-content h1 {
-            font-size: 48px;
-            color: #ff6b6b;
-            margin-bottom: 20px;
-        }
-        .popup-content p {
-            font-size: 24px;
-            color: #ffffff;
-            margin-bottom: 30px;
-        }
-        .popup-content .stButton button {
-            background-color: #ff6b6b;
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-            padding: 20px 60px;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .popup-content .stButton button:hover {
-            background-color: #ff4757;
-            transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(255, 107, 107, 0.5);
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    @st.dialog("ARE YOU NOT ENTERTAINED?")
+    def show_popup():
+        st.markdown("### You've drawn 3 numbers... that's enough for now")
+        st.markdown("---")
+        st.write("So... are you entertained?")
+        
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col2:
+            if st.button("🎭 YES", type="primary", use_container_width=True):
+                st.session_state.draw_count = 0
+                st.session_state.show_popup = False
+                st.rerun()
     
-    # Render the pop-up using Streamlit components
-    with st.container():
-        st.markdown('<div class="popup-overlay">', unsafe_allow_html=True)
-        st.markdown('<div class="popup-content">', unsafe_allow_html=True)
-        
-        st.markdown("## ARE YOU NOT ENTERTAINED?")
-        st.markdown("### (You've drawn 3 numbers... that's enough for now)")
-        
-        if st.button("YES", key="entertained_button", use_container_width=True):
-            st.session_state.draw_count = 0
-            st.session_state.show_popup = False
-            st.rerun()
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+    show_popup()
 
 # --- Main App ---
 st.write("Draw a digit below and watch the AI recognize it!")
@@ -175,10 +121,10 @@ if canvas_result.image_data is not None:
         predicted_digit = np.argmax(prediction)
         confidence = np.max(prediction) * 100
         
-        # --- Increment counter (only if prediction is decent) ---
-        if confidence > 30:  # Only count if it's a real attempt
+        # --- Increment counter ---
+        if confidence > 30:
             st.session_state.draw_count += 1
-            if st.session_state.draw_count >= 3:
+            if st.session_state.draw_count >= 3 and not st.session_state.show_popup:
                 st.session_state.show_popup = True
                 st.rerun()
         
@@ -193,6 +139,6 @@ if canvas_result.image_data is not None:
         
         st.bar_chart(prediction[0])
     else:
-        st.info("ARE YOU NOT ENTERTAINED?")
+        st.info("draw a number...and behold!")
 else:
-    st.info("ARE YOU NOT ENTERTAINED?")
+    st.info("draw a number...and behold!")
